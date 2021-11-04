@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1035196150313",
+    "project_id": "notifikasifirebase-8455c",
+    "storage_bucket": "notifikasifirebase-8455c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1035196150313:android:38e36bb63e7f273e0fe238",
+        "android_client_info": {
+          "package_name": "com.surelabs.notifikasifirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1035196150313-ep2nut97eg5q322rv5l6rjjldid7s0dh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5_AVqRVNss6jex6CwLWvQUa-f4AlKoSA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1035196150313-ep2nut97eg5q322rv5l6rjjldid7s0dh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1035196150313:android:d19802042f7f99ec0fe238",
+        "android_client_info": {
+          "package_name": "com.surelabsid.libs.flutter.flutter_libs"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1035196150313-ep2nut97eg5q322rv5l6rjjldid7s0dh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5_AVqRVNss6jex6CwLWvQUa-f4AlKoSA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1035196150313-ep2nut97eg5q322rv5l6rjjldid7s0dh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

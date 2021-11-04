@@ -1,16 +1,20 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
+import 'package:flutter_libs/locations/GpsTracker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
-  final firstCamera = cameras.first;
+  final firstCamera = cameras.firstWhere(
+      (camera) => camera.lensDirection == CameraLensDirection.front);
 
   runApp(MaterialApp(
     home: TakePictureScreen(
       camera: firstCamera,
+
     ),
     theme: ThemeData(primarySwatch: Colors.brown),
   ));
@@ -27,19 +31,14 @@ class TakePictureScreen extends StatefulWidget {
 class _TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  Widget body = Center(
+    child: const CircularProgressIndicator(),
+  );
 
   @override
   void initState() {
     super.initState();
-
-    _controller = CameraController(
-        // get a specify camera
-        widget.camera,
-        //define a resolution to use
-        ResolutionPreset.medium);
-
-    //initialize controller
-    _initializeControllerFuture = _controller.initialize();
+    initializePermission();
   }
 
   @override
@@ -54,7 +53,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
       appBar: AppBar(
         title: Text("Camera Handling"),
       ),
-      body: cameraBuidler(),
+      body: body,
       floatingActionButton: takeAPicture(),
     );
   }
@@ -67,17 +66,15 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
           await _initializeControllerFuture;
           //attempt to take a picture and get the file `image` where it was saved
           final image = await _controller.takePicture();
-          var directory = getExternalStorageDirectory();
+          var directory = getApplicationDocumentsDirectory();
           var milis, path, exif;
 
           directory.then((value) => {
-            milis = DateTime.now().millisecond,
-            path = "${value!.path}/${milis}.jpg",
-            image.saveTo(path),
-            getExifInfo(path)
-          });
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("saved path")));
+                milis = DateTime.now().millisecond,
+                path = "${value.path}/${milis}.jpg",
+                image.saveTo(path),
+                getExifInfo(path)
+              });
         } catch (e) {
           print(e);
         }
@@ -87,6 +84,15 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   }
 
   Widget cameraBuidler() {
+    _controller = CameraController(
+        // get a specify camera
+        widget.camera,
+        //define a resolution to use
+        ResolutionPreset.ultraHigh);
+
+    //initialize controller
+    _initializeControllerFuture = _controller.initialize();
+
     return FutureBuilder(
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
@@ -101,10 +107,28 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
     );
   }
 
-  getExifInfo(path) {
+  getExifInfo(path) async {
     final exif = FlutterExif.fromPath(path);
-    exif.setLatLong(-7.7607095, 110.4121785);
-// apply attributes
-    exif.saveAttributes();
+    GPSTracker().getLocation().then((value) => {
+          if (value != null)
+            {
+              exif.setLatLong(value.latitude!, value.longitude!),
+              exif.saveAttributes()
+            }
+        });
+  }
+
+  Future<void> initializePermission() async {
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.location,
+      Permission.storage,
+    ].request().then((value) => initializeBody());
+    print(statuses.entries);
+  }
+
+  initializeBody() {
+    setState(() {
+      this.body = cameraBuidler();
+    });
   }
 }

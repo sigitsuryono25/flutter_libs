@@ -28,6 +28,11 @@ dependencies:
   path_provider:
   path:
   flutter_exif_plugin: ^1.0.0
+  location: ^4.2.0
+  permission_handler: ^8.2.5
+  firebase_messaging: ^10.0.9
+  firebase_core:
+  flutter_local_notifications: ^9.0.2
 
 
   # The following adds the Cupertino Icons font to your application.
