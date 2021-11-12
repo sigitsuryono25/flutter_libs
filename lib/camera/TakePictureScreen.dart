@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
 import 'package:flutter_libs/locations/GpsTracker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<void> main() async {
@@ -14,7 +15,6 @@ Future<void> main() async {
   runApp(MaterialApp(
     home: TakePictureScreen(
       camera: firstCamera,
-
     ),
     theme: ThemeData(primarySwatch: Colors.brown),
   ));
@@ -66,15 +66,11 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
           await _initializeControllerFuture;
           //attempt to take a picture and get the file `image` where it was saved
           final image = await _controller.takePicture();
-          var directory = getApplicationDocumentsDirectory();
-          var milis, path, exif;
-
-          directory.then((value) => {
-                milis = DateTime.now().millisecond,
-                path = "${value.path}/${milis}.jpg",
-                image.saveTo(path),
-                getExifInfo(path)
-              });
+          var directory = "/storage/emulated/0/FlutterLibs/";
+          var milis, path;
+          milis = DateTime.now().millisecond;
+          path = "$directory/$milis.jpg";
+          new Directory(directory).create().then((value) => getExifInfo(path, image));
         } catch (e) {
           print(e);
         }
@@ -107,7 +103,8 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
     );
   }
 
-  getExifInfo(path) async {
+  getExifInfo(path, XFile image) async {
+    image.saveTo(path);
     final exif = FlutterExif.fromPath(path);
     GPSTracker().getLocation().then((value) => {
           if (value != null)
@@ -121,12 +118,16 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   Future<void> initializePermission() async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.location,
+      Permission.accessMediaLocation,
+      Permission.manageExternalStorage,
       Permission.storage,
-    ].request().then((value) => initializeBody());
+      Permission.camera,
+      Permission.microphone,
+    ].request().then((value) => initializeBody(value));
     print(statuses.entries);
   }
 
-  initializeBody() {
+  initializeBody(Map<Permission, PermissionStatus> result) {
     setState(() {
       this.body = cameraBuidler();
     });
